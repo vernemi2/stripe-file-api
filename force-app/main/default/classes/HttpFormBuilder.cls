@@ -1,7 +1,6 @@
 /**
  * Credits goes to: https://github.com/muenzpraeger/salesforce-einstein-platform-apex/blob/master/force-app/main/default/classes/Einstein_HttpBodyPart.cls
  * https://github.com/MetaMind/apex-utils/blob/master/Vision.apex
- * And to Michal Verner to stitching it up, will be in the repo hopefully soon as well :)
  */
 public class HttpFormBuilder {
     private static final String LOGMARK = '** HttpFormBuilder ** ';
@@ -15,12 +14,7 @@ public class HttpFormBuilder {
     public static String getContentType() {
         String out = 'multipart/form-data; boundary="' + Boundary + '"';
 
-        System.debug(
-            LoggingLevel.DEBUG,
-            LOGMARK +
-            'getContentType - out: ' +
-            out
-        );
+        System.debug(LoggingLevel.DEBUG, LOGMARK + 'getContentType - out: ' + out);
         return out;
     }
 
@@ -28,23 +22,14 @@ public class HttpFormBuilder {
      *  Base 64 encode value. If encoded value contains '=' at the end, add white space before the line breaks and encode again till all the '=' are removed.
      */
     public static String safelyEncode(String value, String lineBreaks) {
-        String encodedValue = EncodingUtil.base64Encode(
-            Blob.valueOf(value + lineBreaks)
-        );
+        String encodedValue = EncodingUtil.base64Encode(Blob.valueOf(value + lineBreaks));
 
         while (encodedValue.endsWith('=')) {
             value += ' ';
-            encodedValue = EncodingUtil.base64Encode(
-                Blob.valueOf(value + lineBreaks)
-            );
+            encodedValue = EncodingUtil.base64Encode(Blob.valueOf(value + lineBreaks));
         }
 
-        System.debug(
-            LoggingLevel.DEBUG,
-            LOGMARK +
-            'safelyEncode - encodedValue: ' +
-            encodedValue
-        );
+        System.debug(LoggingLevel.DEBUG, LOGMARK + 'safelyEncode - encodedValue: ' + encodedValue);
         return encodedValue;
     }
 
@@ -54,12 +39,7 @@ public class HttpFormBuilder {
     public static String writeBoundary() {
         string out = '--' + Boundary + '\r\n';
 
-        System.debug(
-            LoggingLevel.DEBUG,
-            LOGMARK +
-            'writeBoundary - out: ' +
-            out
-        );
+        System.debug(LoggingLevel.DEBUG, LOGMARK + 'writeBoundary - out: ' + out);
         return out;
     }
 
@@ -89,12 +69,7 @@ public class HttpFormBuilder {
 
         value += '--' + Boundary + '--';
 
-        System.debug(
-            LoggingLevel.DEBUG,
-            LOGMARK +
-            'writeEncBoundary - value: ' +
-            value
-        );
+        System.debug(LoggingLevel.DEBUG, LOGMARK + 'writeEncBoundary - value: ' + value);
 
         return EncodingUtil.base64Encode(Blob.valueOf(value));
     }
@@ -103,18 +78,10 @@ public class HttpFormBuilder {
      *  Write a key-value pair to the form's body.
      */
     public static string writeBodyParameter(string key, string value) {
-        String contentDisposition =
-            'Content-Disposition: form-data; name="' +
-            key +
-            '"';
+        String contentDisposition = 'Content-Disposition: form-data; name="' + key + '"';
         String out = contentDisposition + '\r\n\r\n' + value + '\r\n';
 
-        System.debug(
-            LoggingLevel.DEBUG,
-            LOGMARK +
-            'writeBodyParameter - out: ' +
-            out
-        );
+        System.debug(LoggingLevel.DEBUG, LOGMARK + 'writeBodyParameter - out: ' + out);
         return out;
     }
 
@@ -136,12 +103,7 @@ public class HttpFormBuilder {
 
         out += 'Content-Type: ' + contentType;
 
-        System.debug(
-            LoggingLevel.DEBUG,
-            LOGMARK +
-            'writeBlobDispositionPart - out: ' +
-            out
-        );
+        System.debug(LoggingLevel.DEBUG, LOGMARK + 'writeBlobDispositionPart - out: ' + out);
         return out;
     }
 
@@ -150,10 +112,7 @@ public class HttpFormBuilder {
      */
     public static string writeBlobBodyWithBoundary(String file64) {
         Integer file64Length = file64.length();
-        String last4Bytes = file64.substring(
-            file64.length() - 4,
-            file64.length()
-        );
+        String last4Bytes = file64.substring(file64.length() - 4, file64.length());
 
         // Avoid padding the file data with spaces, which SafelyPad does
         // http://salesforce.stackexchange.com/a/33326/102

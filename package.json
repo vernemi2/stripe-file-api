@@ -1,0 +1,16 @@
+{
+  "name": "stripe-file-api",
+  "version": "1.0.0",
+  "description": "Salesforce wrapper for Stripe API",
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "1.18.2",
+    "prettier-plugin-apex": "1.0.0-rc.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vernemi2/stripe-file-api"
+  },
+  "author": "",
+  "homepage": "https://github.com/vernemi2/stripe-file-api/blob/master/README.md"
+}

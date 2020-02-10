@@ -8,7 +8,8 @@ private class StripeFileApi_Test {
         String fileId = StripeFileApi.createFile(
             Blob.valueOf('Test content'),
             'Test file.jpg',
-            'image/jpeg'
+            'image/jpeg',
+            StripeFileApi.Purpose.identity_document
         );
         Test.stopTest();
 
@@ -17,17 +18,15 @@ private class StripeFileApi_Test {
 
     @IsTest
     static void createFile_Error() {
-        Test.setMock(
-            HttpCalloutMock.class,
-            new StripeFileApiCreateFileMock(true)
-        );
+        Test.setMock(HttpCalloutMock.class, new StripeFileApiCreateFileMock(true));
 
         try {
             Test.startTest();
             String fileId = StripeFileApi.createFile(
                 Blob.valueOf('Test content'),
                 'Test file.11',
-                null
+                null,
+                StripeFileApi.Purpose.identity_document
             );
             Test.stopTest();
             System.assert(false, 'Exception should have been thrown');

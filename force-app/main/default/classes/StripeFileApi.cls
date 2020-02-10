@@ -1,30 +1,36 @@
+/**
+ * File upload uses publishable key, more info: https://stripe.com/docs/file-upload
+ */
 public inherited sharing class StripeFileApi {
     private static final String LOGMARK = '** StripeFileApi ** ';
 
     public static final String PUBLISHABLE_KEY_QA_SETTINGS = 'Stripe_Publishable_Key_QA';
     public static final String PUBLISHABLE_KEY_SETTINGS = 'Stripe_Publishable_Key';
-    
+
     public static final String FILES_ENDPOINT = 'https://files.stripe.com/v1/files';
     public static final String STRIPE_PUBLISHABLE_KEY = 'test_key';
+
+    public enum Purpose {
+        business_logo,
+        customer_signature,
+        dispute_evidence,
+        identity_document,
+        pci_document,
+        tax_document_user_upload
+    }
 
     public static String createFile(
         Blob fileContent,
         String fileName,
-        String contentType
+        String contentType,
+        Purpose purpose
     ) {
         String formData = '';
 
         formData += HttpFormBuilder.writeBoundary();
-        formData += HttpFormBuilder.writeBodyParameter(
-            'purpose',
-            'identity_document'
-        );
+        formData += HttpFormBuilder.writeBodyParameter('purpose', purpose.name());
         formData += HttpFormBuilder.writeBoundary();
-        formData += HttpFormBuilder.writeBlobDispositionPart(
-            'file',
-            fileName,
-            contentType
-        );
+        formData += HttpFormBuilder.writeBlobDispositionPart('file', fileName, contentType);
         String formData64 = HttpFormBuilder.safelyEncode(formData, '\r\n\r\n');
         formData64 += HttpFormBuilder.writeBlobBodyWithBoundary(
             EncodingUtil.base64Encode(fileContent)
@@ -42,18 +48,8 @@ public inherited sharing class StripeFileApi {
         Http http = new Http();
 
         HTTPResponse res = http.send(httpRequest);
-        System.debug(
-            LoggingLevel.DEBUG,
-            LOGMARK +
-            'res.getStatusCode(): ' +
-            res.getStatusCode()
-        );
-        System.debug(
-            LoggingLevel.DEBUG,
-            LOGMARK +
-            'res.getBody(): ' +
-            res.getBody()
-        );
+        System.debug(LoggingLevel.DEBUG, LOGMARK + 'res.getStatusCode(): ' + res.getStatusCode());
+        System.debug(LoggingLevel.DEBUG, LOGMARK + 'res.getBody(): ' + res.getBody());
 
         CreateFileResponse out = (CreateFileResponse) JSON.deserialize(
             res.getBody(),
@@ -69,8 +65,7 @@ public inherited sharing class StripeFileApi {
         String userName = STRIPE_PUBLISHABLE_KEY;
 
         Blob headerValue = Blob.valueOf(username + ':');
-        String authorizationHeader =
-            'Basic ' + EncodingUtil.base64Encode(headerValue);
+        String authorizationHeader = 'Basic ' + EncodingUtil.base64Encode(headerValue);
 
         HttpRequest httpRequest = new HttpRequest();
 
@@ -88,17 +83,12 @@ public inherited sharing class StripeFileApi {
     }
 
     private static void validateResponse(CreateFileResponse createFileResponse, HttpResponse res) {
-
         if (createFileResponse.id == null && res.getStatusCode() >= 400) {
             ResponseError error = (ResponseError) JSON.deserialize(
                 res.getBody(),
                 ResponseError.class
             );
-            if (
-                error != null &&
-                error.error != null &&
-                String.isNotBlank(error.error.message)
-            ) {
+            if (error != null && error.error != null && String.isNotBlank(error.error.message)) {
                 throw new StripeFileApiException(error.error.message);
             }
         }

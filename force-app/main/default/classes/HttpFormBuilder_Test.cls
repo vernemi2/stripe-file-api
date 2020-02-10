@@ -14,8 +14,7 @@ private class HttpFormBuilder_Test {
         String safelyEncodedValue = HttpFormBuilder.safelyEncode('Test', '');
         System.assert(!safelyEncodedValue.contains('='));
 
-        String originalValue = EncodingUtil.base64Decode(safelyEncodedValue)
-            .toString();
+        String originalValue = EncodingUtil.base64Decode(safelyEncodedValue).toString();
         System.assertEquals('Test  ', originalValue);
     }
 
@@ -29,9 +28,7 @@ private class HttpFormBuilder_Test {
 
     @IsTest
     static void writeEncBoundary() {
-        String encodedBoundary = HttpFormBuilder.writeEncBoundary(
-            HttpFormBuilder.EndingType.CrLf
-        );
+        String encodedBoundary = HttpFormBuilder.writeEncBoundary(HttpFormBuilder.EndingType.CrLf);
         System.assertEquals(
             '--1ff13444ed8140c7a32fc4e6451aa76d--',
             EncodingUtil.base64Decode(encodedBoundary).toString()
@@ -50,11 +47,7 @@ private class HttpFormBuilder_Test {
     static void writeBlobDispositionPart() {
         System.assertEquals(
             'Content-Disposition: form-data; name="test"; filename="test file name.jpg"\r\nContent-Type: image/jpeg',
-            HttpFormBuilder.writeBlobDispositionPart(
-                'test',
-                'test file name.jpg',
-                'image/jpeg'
-            )
+            HttpFormBuilder.writeBlobDispositionPart('test', 'test file name.jpg', 'image/jpeg')
         );
     }
 
